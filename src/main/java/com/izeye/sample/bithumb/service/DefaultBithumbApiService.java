@@ -20,6 +20,7 @@ public class DefaultBithumbApiService implements BithumbApiService {
 
 	private static final String URL_TICKER = URL_PUBLIC + "/ticker/{currency}";
 	private static final String URL_ORDERBOOK = URL_PUBLIC + "/orderbook/{currency}";
+	private static final String URL_RECENT_TRANSACTIONS = URL_PUBLIC + "/recent_transactions/{currency}";
 
 	private final RestTemplate restTemplate;
 
@@ -35,6 +36,11 @@ public class DefaultBithumbApiService implements BithumbApiService {
 	@Override
 	public Map<String, Object> getOrderbook(Currency currency) {
 		return this.restTemplate.getForObject(URL_ORDERBOOK, Map.class, currency);
+	}
+
+	@Override
+	public Map<String, Object> getRecentTransactions(Currency currency) {
+		return this.restTemplate.getForObject(URL_RECENT_TRANSACTIONS, Map.class, currency);
 	}
 
 }

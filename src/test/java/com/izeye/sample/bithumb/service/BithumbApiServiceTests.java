@@ -35,4 +35,10 @@ public class BithumbApiServiceTests {
 		System.out.println(orderbook);
 	}
 
+	@Test
+	public void testGetRecentTransactions() {
+		Map<String, Object> recentTransactions = this.bithumbApiService.getRecentTransactions(Currency.BCH);
+		System.out.println(recentTransactions);
+	}
+
 }
