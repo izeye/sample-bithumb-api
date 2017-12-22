@@ -29,4 +29,10 @@ public class BithumbApiServiceTests {
 		System.out.println(ticker);
 	}
 
+	@Test
+	public void testGetOrderbook() {
+		Map<String, Object> orderbook = this.bithumbApiService.getOrderbook(Currency.BCH);
+		System.out.println(orderbook);
+	}
+
 }

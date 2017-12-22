@@ -13,4 +13,6 @@ public interface BithumbApiService {
 
 	Map<String, Object> getTicker(Currency currency);
 
+	Map<String, Object> getOrderbook(Currency currency);
+
 }
