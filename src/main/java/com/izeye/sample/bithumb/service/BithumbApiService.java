@@ -17,4 +17,6 @@ public interface BithumbApiService {
 
 	Map<String, Object> getRecentTransactions(Currency currency);
 
+	Map<String, Object> getAccount(Currency currency);
+
 }

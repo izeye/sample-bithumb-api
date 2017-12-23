@@ -4,8 +4,10 @@ import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -18,6 +20,7 @@ import com.izeye.sample.bithumb.Currency;
  */
 @RunWith(SpringRunner.class)
 @SpringBootTest
+@ActiveProfiles("production")
 public class BithumbApiServiceTests {
 
 	@Autowired
@@ -39,6 +42,14 @@ public class BithumbApiServiceTests {
 	public void testGetRecentTransactions() {
 		Map<String, Object> recentTransactions = this.bithumbApiService.getRecentTransactions(Currency.BCH);
 		System.out.println(recentTransactions);
+	}
+
+	// FIXME: Due to the Bithumb service failures, the keys are not available yet.
+	@Ignore
+	@Test
+	public void testGetAccount() {
+		Map<String, Object> account = this.bithumbApiService.getAccount(Currency.BCH);
+		System.out.println(account);
 	}
 
 }
