@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.Orderbook;
 
 /**
  * Default {@link BithumbApiService}.
@@ -43,8 +44,8 @@ public class DefaultBithumbApiService implements BithumbApiService {
 	}
 
 	@Override
-	public Map<String, Object> getOrderbook(Currency currency) {
-		return this.restTemplate.getForObject(URL_ORDERBOOK, Map.class, currency);
+	public Orderbook getOrderbook(Currency currency) {
+		return this.restTemplate.getForObject(URL_ORDERBOOK, Orderbook.class, currency);
 	}
 
 	@Override

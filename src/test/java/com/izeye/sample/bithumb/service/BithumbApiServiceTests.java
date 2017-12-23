@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.Orderbook;
 
 /**
  * Tests for {@link BithumbApiService}.
@@ -34,7 +35,7 @@ public class BithumbApiServiceTests {
 
 	@Test
 	public void testGetOrderbook() {
-		Map<String, Object> orderbook = this.bithumbApiService.getOrderbook(Currency.BCH);
+		Orderbook orderbook = this.bithumbApiService.getOrderbook(Currency.BCH);
 		System.out.println(orderbook);
 	}
 
