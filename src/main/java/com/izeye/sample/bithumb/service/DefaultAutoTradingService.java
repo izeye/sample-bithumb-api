@@ -95,11 +95,15 @@ public class DefaultAutoTradingService implements AutoTradingService {
 	}
 
 	private int getNextBuyPrice(int basePrice) {
-		return basePrice * (100 - DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES) / 100;
+		return applyPercentages(basePrice, DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES);
 	}
 
 	private int getNextSellPrice(int basePrice) {
-		return basePrice * (100 + DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES) / 100;
+		return applyPercentages(basePrice, DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES);
+	}
+
+	private int applyPercentages(int basePrice, int percentages) {
+		return basePrice * (100 + percentages) / 100;
 	}
 
 	private int calculateGapInPercentages(int baseValue, int value) {
