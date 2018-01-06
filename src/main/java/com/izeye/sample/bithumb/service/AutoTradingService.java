@@ -1,5 +1,7 @@
 package com.izeye.sample.bithumb.service;
 
+import com.izeye.sample.bithumb.Currency;
+
 /**
  * Automated trading service.
  *
@@ -7,7 +9,7 @@ package com.izeye.sample.bithumb.service;
  */
 public interface AutoTradingService {
 
-	void start();
+	void start(Currency currency, double unit);
 
 	void stop();
 

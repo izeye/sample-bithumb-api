@@ -7,8 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import com.izeye.sample.bithumb.Currency;
 
 /**
  * Tests for {@link AutoTradingService}.
@@ -20,14 +23,20 @@ import org.junit.runner.RunWith;
 @ActiveProfiles("production")
 public class AutoTradingServiceTests {
 
+	private static final int LOGIN_WAIT_SECONDS = 60;
+
 	@Autowired
 	private AutoTradingService autoTradingService;
 
+	// NOTE: Manual login involved to pass this test.
+	@Ignore
 	@Test
 	public void test() {
-		startAutoTradingServiceStopThread();
+//		startAutoTradingServiceStopThread();
 
-		this.autoTradingService.start();
+		waitLogin();
+
+		this.autoTradingService.start(Currency.XRP, 1);
 	}
 
 	private void startAutoTradingServiceStopThread() {
@@ -40,6 +49,19 @@ public class AutoTradingServiceTests {
 				throw new RuntimeException(ex);
 			}
 		}).start();
+	}
+
+	private void waitLogin() {
+		try {
+			System.out.println("Sleeping " + LOGIN_WAIT_SECONDS + " second(s)...");
+			for (int i = 0; i < LOGIN_WAIT_SECONDS; i++) {
+				Thread.sleep(TimeUnit.SECONDS.toMillis(1));
+				System.out.println("Elapsed " + (i + 1) + " second(s)");
+			}
+		}
+		catch (InterruptedException ex) {
+			throw new RuntimeException(ex);
+		}
 	}
 
 }

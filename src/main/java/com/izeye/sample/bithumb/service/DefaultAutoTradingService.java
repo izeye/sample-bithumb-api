@@ -21,26 +21,29 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 	private static final long DEFAULT_DELAY_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
 
-	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 3;
+//	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 3;
 //	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 2;
-//	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 1;
+	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 1;
 	private static final int DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES = -DEFAULT_SIGNAL_GAP_IN_PERCENTAGES;
 	private static final int DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES = DEFAULT_SIGNAL_GAP_IN_PERCENTAGES;
 
 	@Autowired
 	private BithumbApiService bithumbApiService;
 
+	@Autowired
+	private TradingService tradingService;
+
 	private volatile boolean running;
 
 	@Override
-	public void start() {
+	public void start(Currency currency, double unit) {
 		this.running = true;
 
-		int basePrice = getCurrentBasePrice();
+		int basePrice = getCurrentBasePrice(currency);
 		logPrices(basePrice);
 
 		while (this.running) {
-			Orderbook orderbook = this.bithumbApiService.getOrderbook(Currency.BCH);
+			Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
 
 			int highestBuyPrice = getHighestBuyPrice(orderbook);
 			int lowestSellPrice = getLowestSellPrice(orderbook);
@@ -50,6 +53,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 			if (buyPriceGapInPercentages <= DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES) {
 				log.info("Try to buy now: {}", lowestSellPrice);
+
+				this.tradingService.buy(currency, lowestSellPrice, unit);
 
 				// FIXME: This should be replaced with the actual buy price.
 				int buyPrice = lowestSellPrice;
@@ -62,6 +67,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 			if (sellPriceGapInPercentages >= DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES) {
 				log.info("Try to sell now: {}", highestBuyPrice);
+
+				this.tradingService.sell(currency, highestBuyPrice, unit);
 
 				// FIXME: This should be replaced with the actual sell price.
 				int sellPrice = highestBuyPrice;
@@ -89,8 +96,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		return orderbook.getData().getAsks().get(0).getPrice();
 	}
 
-	private int getCurrentBasePrice() {
-		Orderbook orderbook = this.bithumbApiService.getOrderbook(Currency.BCH);
+	private int getCurrentBasePrice(Currency currency) {
+		Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
 		return (getHighestBuyPrice(orderbook) + getLowestSellPrice(orderbook)) / 2;
 	}
 

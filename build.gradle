@@ -30,6 +30,7 @@ repositories {
 
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.seleniumhq.selenium:selenium-java")
 
     compileOnly("org.projectlombok:lombok")
 

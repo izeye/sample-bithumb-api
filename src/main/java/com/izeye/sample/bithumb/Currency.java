@@ -1,12 +1,20 @@
 package com.izeye.sample.bithumb;
 
 /**
- * Fill me.
+ * Crypto currency.
  *
  * @author Johnny Lim
  */
 public enum Currency {
 
-	BCH
+	/**
+	 * For Bitcoin Cash
+	 */
+	BCH,
+
+	/**
+	 * For Ripple.
+	 */
+	XRP
 
 }
