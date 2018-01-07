@@ -4,6 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClientException;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -43,43 +44,48 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		logPrices(basePrice);
 
 		while (this.running) {
-			Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
+			try {
+				Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
 
-			int highestBuyPrice = getHighestBuyPrice(orderbook);
-			int lowestSellPrice = getLowestSellPrice(orderbook);
+				int highestBuyPrice = getHighestBuyPrice(orderbook);
+				int lowestSellPrice = getLowestSellPrice(orderbook);
 
-			int buyPriceGapInPercentages = calculateGapInPercentages(basePrice, highestBuyPrice);
-			int sellPriceGapInPercentages = calculateGapInPercentages(basePrice, lowestSellPrice);
+				int buyPriceGapInPercentages = calculateGapInPercentages(basePrice, highestBuyPrice);
+				int sellPriceGapInPercentages = calculateGapInPercentages(basePrice, lowestSellPrice);
 
-			if (buyPriceGapInPercentages <= DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES) {
-				log.info("Try to buy now: {}", lowestSellPrice);
+				if (buyPriceGapInPercentages <= DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES) {
+					log.info("Try to buy now: {}", lowestSellPrice);
 
-				this.tradingService.buy(currency, lowestSellPrice, unit);
+					this.tradingService.buy(currency, lowestSellPrice, unit);
 
-				// FIXME: This should be replaced with the actual buy price.
-				int buyPrice = lowestSellPrice;
-				log.info("Bought now: {}", buyPrice);
+					// FIXME: This should be replaced with the actual buy price.
+					int buyPrice = lowestSellPrice;
+					log.info("Bought now: {}", buyPrice);
 
-				basePrice = buyPrice;
-				logPrices(basePrice);
-				continue;
+					basePrice = buyPrice;
+					logPrices(basePrice);
+					continue;
+				}
+
+				if (sellPriceGapInPercentages >= DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES) {
+					log.info("Try to sell now: {}", highestBuyPrice);
+
+					this.tradingService.sell(currency, highestBuyPrice, unit);
+
+					// FIXME: This should be replaced with the actual sell price.
+					int sellPrice = highestBuyPrice;
+					log.info("Sold now: {}", sellPrice);
+
+					basePrice = sellPrice;
+					logPrices(basePrice);
+					continue;
+				}
+
+				delay();
 			}
-
-			if (sellPriceGapInPercentages >= DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES) {
-				log.info("Try to sell now: {}", highestBuyPrice);
-
-				this.tradingService.sell(currency, highestBuyPrice, unit);
-
-				// FIXME: This should be replaced with the actual sell price.
-				int sellPrice = highestBuyPrice;
-				log.info("Sold now: {}", sellPrice);
-
-				basePrice = sellPrice;
-				logPrices(basePrice);
-				continue;
+			catch (RestClientException ex) {
+				log.error("Target server fault?", ex);
 			}
-
-			delay();
 		}
 	}
 
