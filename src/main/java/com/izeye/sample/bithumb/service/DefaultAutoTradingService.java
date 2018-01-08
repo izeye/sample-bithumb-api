@@ -86,6 +86,9 @@ public class DefaultAutoTradingService implements AutoTradingService {
 			catch (RestClientException ex) {
 				log.error("Target server fault?", ex);
 			}
+			catch (TradingFailedException ex) {
+				log.error("Trading failed?", ex);
+			}
 		}
 	}
 

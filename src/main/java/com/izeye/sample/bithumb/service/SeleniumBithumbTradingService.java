@@ -42,41 +42,51 @@ public class SeleniumBithumbTradingService implements TradingService {
 
 	@Override
 	public void buy(Currency currency, int price, double amount) {
-		this.driver.get(ORDER_URL + currency);
+		try {
+			this.driver.get(ORDER_URL + currency);
 
-		WebElement priceField = driver.findElement(By.id(ID_BUY_PRICE));
-		priceField.clear();
-		priceField.sendKeys(String.valueOf(price));
+			WebElement priceField = driver.findElement(By.id(ID_BUY_PRICE));
+			priceField.clear();
+			priceField.sendKeys(String.valueOf(price));
 
-		WebElement amountField = driver.findElement(By.id(ID_BUY_AMOUNT));
-		amountField.sendKeys(String.valueOf(amount));
+			WebElement amountField = driver.findElement(By.id(ID_BUY_AMOUNT));
+			amountField.sendKeys(String.valueOf(amount));
 
-		WebElement buyButton = driver.findElement(By.id(ID_BUY_BUTTON));
-		buyButton.click();
+			WebElement buyButton = driver.findElement(By.id(ID_BUY_BUTTON));
+			buyButton.click();
 
-		WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
-		confirmButton.click();
+			WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
+			confirmButton.click();
+		}
+		catch (Exception ex) {
+			throw new TradingFailedException("Failed to buy.", ex);
+		}
 	}
 
 	@Override
 	public void sell(Currency currency, int price, double amount) {
-		this.driver.get(ORDER_URL + currency);
+		try {
+			this.driver.get(ORDER_URL + currency);
 
-		WebElement sellTab = this.driver.findElement(By.id(ID_ORDER_TYPE_TAB)).findElement(By.cssSelector(CSS_SELECTOR_TAB_SELL));
-		sellTab.click();
+			WebElement sellTab = this.driver.findElement(By.id(ID_ORDER_TYPE_TAB)).findElement(By.cssSelector(CSS_SELECTOR_TAB_SELL));
+			sellTab.click();
 
-		WebElement priceField = driver.findElement(By.id(ID_SELL_PRICE));
-		priceField.clear();
-		priceField.sendKeys(String.valueOf(price));
+			WebElement priceField = driver.findElement(By.id(ID_SELL_PRICE));
+			priceField.clear();
+			priceField.sendKeys(String.valueOf(price));
 
-		WebElement amountField = driver.findElement(By.id(ID_SELL_AMOUNT));
-		amountField.sendKeys(String.valueOf(amount));
+			WebElement amountField = driver.findElement(By.id(ID_SELL_AMOUNT));
+			amountField.sendKeys(String.valueOf(amount));
 
-		WebElement buyButton = driver.findElement(By.id(ID_SELL_BUTTON));
-		buyButton.click();
+			WebElement buyButton = driver.findElement(By.id(ID_SELL_BUTTON));
+			buyButton.click();
 
-		WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
-		confirmButton.click();
+			WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
+			confirmButton.click();
+		}
+		catch (Exception ex) {
+			throw new TradingFailedException("Failed to sell.", ex);
+		}
 	}
 
 }
