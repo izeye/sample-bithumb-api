@@ -27,9 +27,12 @@ public class SeleniumBithumbTradingService implements TradingService {
 	private static final String ID_SELL_BUTTON = "btnSell";
 	private static final String ID_ORDER_TYPE_TAB = "tradeTypeTab";
 
+	private static final String CLASS_NAME_MESSAGE = "_wModal_msg";
 	private static final String CLASS_NAME_YES_BUTTON = "_wModal_btn_yes";
 
 	private static final String CSS_SELECTOR_TAB_SELL = "li[data-type=Sell]";
+
+	private static final String MESSAGE_FAILED = "잠시 후 이용해 주십시오.9999";
 
 	private final ChromeDriver driver;
 
@@ -57,6 +60,11 @@ public class SeleniumBithumbTradingService implements TradingService {
 
 			WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
 			confirmButton.click();
+
+			WebElement messageElement = driver.findElement(By.className(CLASS_NAME_MESSAGE));
+			if (messageElement.getText().equals(MESSAGE_FAILED)) {
+				throw new TradingFailedException("Failed to buy: " + MESSAGE_FAILED);
+			}
 		}
 		catch (Exception ex) {
 			throw new TradingFailedException("Failed to buy.", ex);
@@ -83,6 +91,11 @@ public class SeleniumBithumbTradingService implements TradingService {
 
 			WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
 			confirmButton.click();
+
+			WebElement messageElement = driver.findElement(By.className(CLASS_NAME_MESSAGE));
+			if (messageElement.getText().equals(MESSAGE_FAILED)) {
+				throw new TradingFailedException("Failed to sell: " + MESSAGE_FAILED);
+			}
 		}
 		catch (Exception ex) {
 			throw new TradingFailedException("Failed to sell.", ex);

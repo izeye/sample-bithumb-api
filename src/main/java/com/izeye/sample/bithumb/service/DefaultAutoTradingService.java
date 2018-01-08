@@ -80,8 +80,6 @@ public class DefaultAutoTradingService implements AutoTradingService {
 					logPrices(basePrice);
 					continue;
 				}
-
-				delay();
 			}
 			catch (RestClientException ex) {
 				log.error("Target server fault?", ex);
@@ -89,6 +87,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 			catch (TradingFailedException ex) {
 				log.error("Trading failed?", ex);
 			}
+
+			delay();
 		}
 	}
 

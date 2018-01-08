@@ -28,8 +28,8 @@ public class AutoTradingServiceTests {
 	@Autowired
 	private AutoTradingService autoTradingService;
 
-	// NOTE: Manual login involved to pass this test.
-	@Ignore
+//	// NOTE: Manual login involved to pass this test.
+//	@Ignore
 	@Test
 	public void test() {
 //		startAutoTradingServiceStopThread();
