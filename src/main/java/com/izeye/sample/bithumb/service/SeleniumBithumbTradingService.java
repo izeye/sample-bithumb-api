@@ -1,7 +1,10 @@
 package com.izeye.sample.bithumb.service;
 
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -14,6 +17,7 @@ import com.izeye.sample.bithumb.Currency;
  * @author Johnny Lim
  */
 @Service
+@Slf4j
 public class SeleniumBithumbTradingService implements TradingService {
 
 	private static final String HOME_URL = "https://www.bithumb.com/";
@@ -32,7 +36,7 @@ public class SeleniumBithumbTradingService implements TradingService {
 
 	private static final String CSS_SELECTOR_TAB_SELL = "li[data-type=Sell]";
 
-	private static final String MESSAGE_FAILED = "잠시 후 이용해 주십시오.9999";
+	private static final String MESSAGE_FAILED = "잠시 후 다시 시도해주세요";
 
 	private final ChromeDriver driver;
 
@@ -61,13 +65,21 @@ public class SeleniumBithumbTradingService implements TradingService {
 			WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
 			confirmButton.click();
 
-			WebElement messageElement = driver.findElement(By.className(CLASS_NAME_MESSAGE));
-			if (messageElement.getText().equals(MESSAGE_FAILED)) {
-				throw new TradingFailedException("Failed to buy: " + MESSAGE_FAILED);
-			}
+			handleFailures();
 		}
 		catch (Exception ex) {
 			throw new TradingFailedException("Failed to buy.", ex);
+		}
+	}
+
+	private void handleFailures() {
+		List<WebElement> messageElements = driver.findElements(By.className(CLASS_NAME_MESSAGE));
+		for (WebElement messageElement : messageElements) {
+			String message = messageElement.getText();
+			log.info("Message: {}", message);
+			if (message.equals(MESSAGE_FAILED)) {
+				throw new TradingFailedException("Failed to buy: " + MESSAGE_FAILED);
+			}
 		}
 	}
 
@@ -92,10 +104,7 @@ public class SeleniumBithumbTradingService implements TradingService {
 			WebElement confirmButton = driver.findElement(By.className(CLASS_NAME_YES_BUTTON));
 			confirmButton.click();
 
-			WebElement messageElement = driver.findElement(By.className(CLASS_NAME_MESSAGE));
-			if (messageElement.getText().equals(MESSAGE_FAILED)) {
-				throw new TradingFailedException("Failed to sell: " + MESSAGE_FAILED);
-			}
+			handleFailures();
 		}
 		catch (Exception ex) {
 			throw new TradingFailedException("Failed to sell.", ex);
