@@ -42,6 +42,7 @@ public class SeleniumBithumbTradingService implements TradingService {
 
 	private static final Set<String> FAILURE_MESSAGES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
 			"잠시 후 다시 시도해주세요",
+			"잠시 후 다시 시도해 주세요.",
 			"잠시 후 이용해 주십시오.9999"
 	)));
 
