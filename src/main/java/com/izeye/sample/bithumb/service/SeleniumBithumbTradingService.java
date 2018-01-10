@@ -1,6 +1,10 @@
 package com.izeye.sample.bithumb.service;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.springframework.stereotype.Service;
 
@@ -36,7 +40,10 @@ public class SeleniumBithumbTradingService implements TradingService {
 
 	private static final String CSS_SELECTOR_TAB_SELL = "li[data-type=Sell]";
 
-	private static final String MESSAGE_FAILED = "잠시 후 다시 시도해주세요";
+	private static final Set<String> FAILURE_MESSAGES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(
+			"잠시 후 다시 시도해주세요",
+			"잠시 후 이용해 주십시오.9999"
+	)));
 
 	private final ChromeDriver driver;
 
@@ -77,8 +84,8 @@ public class SeleniumBithumbTradingService implements TradingService {
 		for (WebElement messageElement : messageElements) {
 			String message = messageElement.getText();
 			log.info("Message: {}", message);
-			if (message.equals(MESSAGE_FAILED)) {
-				throw new TradingFailedException("Failed to buy: " + MESSAGE_FAILED);
+			if (FAILURE_MESSAGES.contains(message)) {
+				throw new TradingFailedException("Failed to buy: " + message);
 			}
 		}
 	}
