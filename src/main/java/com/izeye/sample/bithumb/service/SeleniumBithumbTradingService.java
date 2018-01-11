@@ -14,6 +14,7 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.util.ThreadUtils;
 
 /**
  * Selenium-based Bithumb {@link TradingService}.
@@ -81,7 +82,17 @@ public class SeleniumBithumbTradingService implements TradingService {
 	}
 
 	private void handleFailures() {
-		List<WebElement> messageElements = driver.findElements(By.className(CLASS_NAME_MESSAGE));
+		List<WebElement> messageElements;
+		while (true) {
+			messageElements = driver.findElements(By.className(CLASS_NAME_MESSAGE));
+			int messageElementsSize = messageElements.size();
+			if (messageElementsSize == 2) {
+				break;
+			}
+			log.warn("# of message elements: expected 2 but actual: {}", messageElementsSize);
+			ThreadUtils.delay();
+		}
+
 		for (WebElement messageElement : messageElements) {
 			String message = messageElement.getText();
 			log.info("Message: {}", message);

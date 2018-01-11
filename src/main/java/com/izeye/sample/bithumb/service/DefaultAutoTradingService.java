@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.izeye.sample.bithumb.Currency;
 import com.izeye.sample.bithumb.domain.Orderbook;
+import com.izeye.sample.bithumb.util.ThreadUtils;
 
 /**
  * Default {@link AutoTradingService}.
@@ -19,8 +20,6 @@ import com.izeye.sample.bithumb.domain.Orderbook;
 @Service
 @Slf4j
 public class DefaultAutoTradingService implements AutoTradingService {
-
-	private static final long DEFAULT_DELAY_IN_MILLIS = TimeUnit.SECONDS.toMillis(1);
 
 //	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 3;
 //	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 2;
@@ -88,7 +87,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 				log.error("Trading failed?", ex);
 			}
 
-			delay();
+			ThreadUtils.delay();
 		}
 	}
 
@@ -130,15 +129,6 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		log.info("Base price: {}", basePrice);
 		log.info("Next buy price: {}", getNextBuyPrice(basePrice));
 		log.info("Next sell price: {}", getNextSellPrice(basePrice));
-	}
-
-	private void delay() {
-		try {
-			Thread.sleep(DEFAULT_DELAY_IN_MILLIS);
-		}
-		catch (InterruptedException ex) {
-			throw new RuntimeException(ex);
-		}
 	}
 
 }
