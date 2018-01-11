@@ -36,7 +36,7 @@ public class AutoTradingServiceTests {
 
 		waitLogin();
 
-		this.autoTradingService.start(Currency.XRP, 1);
+		this.autoTradingService.start(Currency.XRP, 2);
 	}
 
 	private void startAutoTradingServiceStopThread() {

@@ -22,8 +22,8 @@ import com.izeye.sample.bithumb.util.ThreadUtils;
 public class DefaultAutoTradingService implements AutoTradingService {
 
 //	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 3;
-//	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 2;
-	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 1;
+	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 2;
+//	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 1;
 	private static final int DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES = -DEFAULT_SIGNAL_GAP_IN_PERCENTAGES;
 	private static final int DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES = DEFAULT_SIGNAL_GAP_IN_PERCENTAGES;
 
@@ -37,6 +37,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 	@Override
 	public void start(Currency currency, double unit) {
+		int tradingCount = 0;
+
 		this.running = true;
 
 		int basePrice = getCurrentBasePrice(currency);
@@ -59,7 +61,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 					// FIXME: This should be replaced with the actual buy price.
 					int buyPrice = lowestSellPrice;
-					log.info("Bought now: {}", buyPrice);
+					tradingCount++;
+					log.info("[{}] Bought now: {}", tradingCount, buyPrice);
 
 					basePrice = buyPrice;
 					logPrices(basePrice);
@@ -73,7 +76,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 					// FIXME: This should be replaced with the actual sell price.
 					int sellPrice = highestBuyPrice;
-					log.info("Sold now: {}", sellPrice);
+					tradingCount++;
+					log.info("[{}] Sold now: {}", tradingCount, sellPrice);
 
 					basePrice = sellPrice;
 					logPrices(basePrice);
