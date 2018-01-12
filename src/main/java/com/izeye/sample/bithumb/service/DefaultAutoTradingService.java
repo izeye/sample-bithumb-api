@@ -1,5 +1,7 @@
 package com.izeye.sample.bithumb.service;
 
+import java.util.concurrent.TimeUnit;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -33,6 +35,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 	@Override
 	public void start(TradingScenario scenario) {
+		long startTime = System.currentTimeMillis();
+
 		Currency currency = scenario.getCurrency();
 		double currencyUnit = scenario.getCurrencyUnit();
 
@@ -65,16 +69,16 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 					// FIXME: This should be replaced with the actual buy price.
 					int buyPrice = lowestSellPrice;
-					basePrice = buyPrice;
-					logPrices(basePrice, strategy);
-
 					int subTotalBuyPrice = (int) (buyPrice * currencyUnit);
 					int tradingFee = getTradingFee(subTotalBuyPrice);
 					log.info("Bought now: {} (Fee: {})", buyPrice, tradingFee);
 
-					totalBuyPrice += (buyPrice + tradingFee);
+					basePrice = buyPrice;
+					logPrices(basePrice, strategy);
+
+					totalBuyPrice += (subTotalBuyPrice + tradingFee);
 					logTotalStatistics(
-							totalBuyUnits, totalSellUnits, totalBuyPrice, totalSellPrice, basePrice);
+							totalBuyUnits, totalSellUnits, totalBuyPrice, totalSellPrice, basePrice, startTime);
 					continue;
 				}
 
@@ -86,16 +90,16 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 					// FIXME: This should be replaced with the actual sell price.
 					int sellPrice = highestBuyPrice;
-					basePrice = sellPrice;
-					logPrices(basePrice, strategy);
-
 					int subTotalSellPrice = (int) (sellPrice * currencyUnit);
 					int tradingFee = getTradingFee(subTotalSellPrice);
 					log.info("Sold now: {} (Fee: {})", sellPrice, tradingFee);
 
-					totalSellPrice += (sellPrice - tradingFee);
+					basePrice = sellPrice;
+					logPrices(basePrice, strategy);
+
+					totalSellPrice += (subTotalSellPrice - tradingFee);
 					logTotalStatistics(
-							totalBuyUnits, totalSellUnits, totalBuyPrice, totalSellPrice, basePrice);
+							totalBuyUnits, totalSellUnits, totalBuyPrice, totalSellPrice, basePrice, startTime);
 					continue;
 				}
 			}
@@ -112,7 +116,9 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 	private void logTotalStatistics(
 			int totalBuyUnits, int totalSellUnits, long totalBuyPrice, long totalSellPrice,
-			int currentPrice) {
+			int currentPrice, long startTime) {
+		long elapsedTimeInMillis = System.currentTimeMillis() - startTime;
+		log.info("Elapsed time: {} minute(s)", TimeUnit.MILLISECONDS.toMinutes(elapsedTimeInMillis));
 		log.info("Total gain: {}", totalSellPrice - totalBuyPrice);
 		int estimatedAdditionalGain = (totalBuyUnits - totalSellUnits) * currentPrice;
 		log.info("Estimated total gain: {}", totalSellPrice - totalBuyPrice + estimatedAdditionalGain);
