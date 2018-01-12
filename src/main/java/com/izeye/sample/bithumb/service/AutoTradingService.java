@@ -1,6 +1,6 @@
 package com.izeye.sample.bithumb.service;
 
-import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.TradingScenario;
 
 /**
  * Automated trading service.
@@ -9,7 +9,7 @@ import com.izeye.sample.bithumb.Currency;
  */
 public interface AutoTradingService {
 
-	void start(Currency currency, double unit);
+	void start(TradingScenario scenario);
 
 	void stop();
 

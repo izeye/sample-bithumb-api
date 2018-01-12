@@ -1,7 +1,5 @@
 package com.izeye.sample.bithumb.service;
 
-import java.util.concurrent.TimeUnit;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
@@ -10,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import com.izeye.sample.bithumb.Currency;
 import com.izeye.sample.bithumb.domain.Orderbook;
+import com.izeye.sample.bithumb.domain.TradingScenario;
+import com.izeye.sample.bithumb.domain.TradingStrategy;
 import com.izeye.sample.bithumb.util.ThreadUtils;
 
 /**
@@ -21,11 +21,7 @@ import com.izeye.sample.bithumb.util.ThreadUtils;
 @Slf4j
 public class DefaultAutoTradingService implements AutoTradingService {
 
-//	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 3;
-	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 2;
-//	private static final int DEFAULT_SIGNAL_GAP_IN_PERCENTAGES = 1;
-	private static final int DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES = -DEFAULT_SIGNAL_GAP_IN_PERCENTAGES;
-	private static final int DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES = DEFAULT_SIGNAL_GAP_IN_PERCENTAGES;
+	private static final double BITHUMB_TRADING_FEE_IN_PERCENTAGES = 0.15d;
 
 	@Autowired
 	private BithumbApiService bithumbApiService;
@@ -36,14 +32,23 @@ public class DefaultAutoTradingService implements AutoTradingService {
 	private volatile boolean running;
 
 	@Override
-	public void start(Currency currency, double unit) {
+	public void start(TradingScenario scenario) {
+		Currency currency = scenario.getCurrency();
+		double currencyUnit = scenario.getCurrencyUnit();
+
+		TradingStrategy strategy = new TradingStrategy(scenario.getSignalGapInPercentages());
+
 		int tradingCount = 0;
 
 		this.running = true;
 
 		int basePrice = getCurrentBasePrice(currency);
-		logPrices(basePrice);
+		logPrices(basePrice, strategy);
 
+		int totalBuys = 0;
+		int totalSells = 0;
+		long totalBuyPrice = 0;
+		long totalSellPrice = 0;
 		while (this.running) {
 			try {
 				Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
@@ -54,33 +59,46 @@ public class DefaultAutoTradingService implements AutoTradingService {
 				int buyPriceGapInPercentages = calculateGapInPercentages(basePrice, highestBuyPrice);
 				int sellPriceGapInPercentages = calculateGapInPercentages(basePrice, lowestSellPrice);
 
-				if (buyPriceGapInPercentages <= DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES) {
+				if (buyPriceGapInPercentages <= strategy.getBuySignalGapInPercentages()) {
 					log.info("Try to buy now: {}", lowestSellPrice);
 
-					this.tradingService.buy(currency, lowestSellPrice, unit);
+					this.tradingService.buy(currency, lowestSellPrice, currencyUnit);
+					totalBuys++;
 
 					// FIXME: This should be replaced with the actual buy price.
 					int buyPrice = lowestSellPrice;
-					tradingCount++;
-					log.info("[{}] Bought now: {}", tradingCount, buyPrice);
+					int tradingFee = getTradingFee(buyPrice);
+
+					log.info("Bought now: {} (Fee: {})", buyPrice, tradingFee);
+
+					totalBuyPrice += (buyPrice + tradingFee);
+					log.info("Total gain: {}", totalSellPrice - totalBuyPrice);
+					log.info("Total buys: {}", totalBuys);
+					log.info("Total sells: {}", totalSells);
 
 					basePrice = buyPrice;
-					logPrices(basePrice);
+					logPrices(basePrice, strategy);
 					continue;
 				}
 
-				if (sellPriceGapInPercentages >= DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES) {
+				if (sellPriceGapInPercentages >= strategy.getSellSignalGapInPercentages()) {
 					log.info("Try to sell now: {}", highestBuyPrice);
 
-					this.tradingService.sell(currency, highestBuyPrice, unit);
+					this.tradingService.sell(currency, highestBuyPrice, currencyUnit);
+					totalSells++;
 
 					// FIXME: This should be replaced with the actual sell price.
 					int sellPrice = highestBuyPrice;
-					tradingCount++;
-					log.info("[{}] Sold now: {}", tradingCount, sellPrice);
+					int tradingFee = getTradingFee(sellPrice);
+					log.info("Sold now: {} (Fee: {})", sellPrice, tradingFee);
+
+					totalSellPrice += (sellPrice - tradingFee);
+					log.info("Total gain: {}", totalSellPrice - totalBuyPrice);
+					log.info("Total buys: {}", totalBuys);
+					log.info("Total sells: {}", totalSells);
 
 					basePrice = sellPrice;
-					logPrices(basePrice);
+					logPrices(basePrice, strategy);
 					continue;
 				}
 			}
@@ -113,12 +131,12 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		return (getHighestBuyPrice(orderbook) + getLowestSellPrice(orderbook)) / 2;
 	}
 
-	private int getNextBuyPrice(int basePrice) {
-		return applyPercentages(basePrice, DEFAULT_BUY_SIGNAL_GAP_IN_PERCENTAGES);
+	private int getNextBuyPrice(int basePrice, int buySignalGapInPercentages) {
+		return applyPercentages(basePrice, buySignalGapInPercentages);
 	}
 
-	private int getNextSellPrice(int basePrice) {
-		return applyPercentages(basePrice, DEFAULT_SELL_SIGNAL_GAP_IN_PERCENTAGES);
+	private int getNextSellPrice(int basePrice, int sellSignalGapInPercentages) {
+		return applyPercentages(basePrice, sellSignalGapInPercentages);
 	}
 
 	private int applyPercentages(int basePrice, int percentages) {
@@ -129,10 +147,16 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		return (value - baseValue) * 100 / baseValue;
 	}
 
-	private void logPrices(int basePrice) {
+	private void logPrices(int basePrice, TradingStrategy strategy) {
 		log.info("Base price: {}", basePrice);
-		log.info("Next buy price: {}", getNextBuyPrice(basePrice));
-		log.info("Next sell price: {}", getNextSellPrice(basePrice));
+		log.info("Next buy price: {}", getNextBuyPrice(
+				basePrice, strategy.getBuySignalGapInPercentages()));
+		log.info("Next sell price: {}", getNextSellPrice(
+				basePrice, strategy.getSellSignalGapInPercentages()));
+	}
+
+	private int getTradingFee(int price) {
+		return (int) (price * BITHUMB_TRADING_FEE_IN_PERCENTAGES / 100);
 	}
 
 }

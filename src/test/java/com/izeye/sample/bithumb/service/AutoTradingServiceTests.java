@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.TradingScenario;
 
 /**
  * Tests for {@link AutoTradingService}.
@@ -25,18 +26,36 @@ public class AutoTradingServiceTests {
 
 	private static final int LOGIN_WAIT_SECONDS = 60;
 
+	private static final TradingScenario SCENARIO_1 = new TradingScenario(Currency.XRP, 1, 1);
+	private static final TradingScenario SCENARIO_2 = new TradingScenario(Currency.XRP, 2, 2);
+	private static final TradingScenario SCENARIO_3 = new TradingScenario(Currency.XRP, 3, 3);
+
 	@Autowired
 	private AutoTradingService autoTradingService;
 
 //	// NOTE: Manual login involved to pass this test.
 //	@Ignore
 	@Test
-	public void test() {
+	public void runScenario1() {
 //		startAutoTradingServiceStopThread();
 
+		runScenario(SCENARIO_1);
+	}
+
+	@Test
+	public void runScenario2() {
+		runScenario(SCENARIO_2);
+	}
+
+	@Test
+	public void runScenario3() {
+		runScenario(SCENARIO_3);
+	}
+
+	private void runScenario(TradingScenario scenario) {
 		waitLogin();
 
-		this.autoTradingService.start(Currency.XRP, 2);
+		this.autoTradingService.start(scenario);
 	}
 
 	private void startAutoTradingServiceStopThread() {
