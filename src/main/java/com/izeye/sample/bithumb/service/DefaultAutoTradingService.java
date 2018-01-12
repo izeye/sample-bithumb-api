@@ -38,15 +38,13 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 		TradingStrategy strategy = new TradingStrategy(scenario.getSignalGapInPercentages());
 
-		int tradingCount = 0;
-
 		this.running = true;
 
 		int basePrice = getCurrentBasePrice(currency);
 		logPrices(basePrice, strategy);
 
-		int totalBuys = 0;
-		int totalSells = 0;
+		int totalBuyUnits = 0;
+		int totalSellUnits = 0;
 		long totalBuyPrice = 0;
 		long totalSellPrice = 0;
 		while (this.running) {
@@ -63,21 +61,20 @@ public class DefaultAutoTradingService implements AutoTradingService {
 					log.info("Try to buy now: {}", lowestSellPrice);
 
 					this.tradingService.buy(currency, lowestSellPrice, currencyUnit);
-					totalBuys++;
+					totalBuyUnits += currencyUnit;
 
 					// FIXME: This should be replaced with the actual buy price.
 					int buyPrice = lowestSellPrice;
-					int tradingFee = getTradingFee(buyPrice);
+					basePrice = buyPrice;
+					logPrices(basePrice, strategy);
 
+					int subTotalBuyPrice = (int) (buyPrice * currencyUnit);
+					int tradingFee = getTradingFee(subTotalBuyPrice);
 					log.info("Bought now: {} (Fee: {})", buyPrice, tradingFee);
 
 					totalBuyPrice += (buyPrice + tradingFee);
-					log.info("Total gain: {}", totalSellPrice - totalBuyPrice);
-					log.info("Total buys: {}", totalBuys);
-					log.info("Total sells: {}", totalSells);
-
-					basePrice = buyPrice;
-					logPrices(basePrice, strategy);
+					logTotalStatistics(
+							totalBuyUnits, totalSellUnits, totalBuyPrice, totalSellPrice, basePrice);
 					continue;
 				}
 
@@ -85,20 +82,20 @@ public class DefaultAutoTradingService implements AutoTradingService {
 					log.info("Try to sell now: {}", highestBuyPrice);
 
 					this.tradingService.sell(currency, highestBuyPrice, currencyUnit);
-					totalSells++;
+					totalSellUnits++;
 
 					// FIXME: This should be replaced with the actual sell price.
 					int sellPrice = highestBuyPrice;
-					int tradingFee = getTradingFee(sellPrice);
+					basePrice = sellPrice;
+					logPrices(basePrice, strategy);
+
+					int subTotalSellPrice = (int) (sellPrice * currencyUnit);
+					int tradingFee = getTradingFee(subTotalSellPrice);
 					log.info("Sold now: {} (Fee: {})", sellPrice, tradingFee);
 
 					totalSellPrice += (sellPrice - tradingFee);
-					log.info("Total gain: {}", totalSellPrice - totalBuyPrice);
-					log.info("Total buys: {}", totalBuys);
-					log.info("Total sells: {}", totalSells);
-
-					basePrice = sellPrice;
-					logPrices(basePrice, strategy);
+					logTotalStatistics(
+							totalBuyUnits, totalSellUnits, totalBuyPrice, totalSellPrice, basePrice);
 					continue;
 				}
 			}
@@ -111,6 +108,16 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 			ThreadUtils.delay();
 		}
+	}
+
+	private void logTotalStatistics(
+			int totalBuyUnits, int totalSellUnits, long totalBuyPrice, long totalSellPrice,
+			int currentPrice) {
+		log.info("Total gain: {}", totalSellPrice - totalBuyPrice);
+		int estimatedAdditionalGain = (totalBuyUnits - totalSellUnits) * currentPrice;
+		log.info("Estimated total gain: {}", totalSellPrice - totalBuyPrice + estimatedAdditionalGain);
+		log.info("Total buy units: {}", totalBuyUnits);
+		log.info("Total sell units: {}", totalSellUnits);
 	}
 
 	@Override
