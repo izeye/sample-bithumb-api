@@ -25,7 +25,7 @@ import com.izeye.sample.bithumb.util.ThreadUtils;
 @Slf4j
 public class SeleniumBithumbTradingService implements TradingService {
 
-	private static final String HOME_URL = "https://www.bithumb.com/";
+	private static final String HOME_URL = "https://www.bithumb.com";
 	private static final String ORDER_URL = HOME_URL + "/trade/order/";
 
 	private static final String ID_BUY_PRICE = "coinAmtCommaBuy";

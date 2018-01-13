@@ -86,7 +86,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 					log.info("Try to sell now: {}", highestBuyPrice);
 
 					this.tradingService.sell(currency, highestBuyPrice, currencyUnit);
-					totalSellUnits++;
+					totalSellUnits += currencyUnit;
 
 					// FIXME: This should be replaced with the actual sell price.
 					int sellPrice = highestBuyPrice;
@@ -104,10 +104,12 @@ public class DefaultAutoTradingService implements AutoTradingService {
 				}
 			}
 			catch (RestClientException ex) {
-				log.error("Target server fault?", ex);
+				log.warn("Target server fault: {}", ex.getMessage());
+				log.debug("Target server fault.", ex);
 			}
 			catch (TradingFailedException ex) {
-				log.error("Trading failed?", ex);
+				log.warn("Trading failed: {}", ex.getMessage());
+				log.debug("Trading failed.", ex);
 			}
 
 			ThreadUtils.delay();
