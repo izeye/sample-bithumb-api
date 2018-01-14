@@ -36,26 +36,12 @@ public class AutoTradingServiceTests {
 //	// NOTE: Manual login involved to pass this test.
 //	@Ignore
 	@Test
-	public void runScenario1() {
+	public void runScenarios() {
 //		startAutoTradingServiceStopThread();
 
-		runScenario(SCENARIO_1);
-	}
-
-	@Test
-	public void runScenario2() {
-		runScenario(SCENARIO_2);
-	}
-
-	@Test
-	public void runScenario3() {
-		runScenario(SCENARIO_3);
-	}
-
-	private void runScenario(TradingScenario scenario) {
 		waitLogin();
 
-		this.autoTradingService.start(scenario);
+		this.autoTradingService.start(SCENARIO_1, SCENARIO_2, SCENARIO_3);
 	}
 
 	private void startAutoTradingServiceStopThread() {

@@ -9,7 +9,7 @@ import com.izeye.sample.bithumb.domain.TradingScenario;
  */
 public interface AutoTradingService {
 
-	void start(TradingScenario scenario);
+	void start(TradingScenario... scenarios);
 
 	void stop();
 
