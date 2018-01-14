@@ -1,6 +1,5 @@
 package com.izeye.sample.bithumb.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
@@ -22,18 +21,32 @@ import com.izeye.sample.bithumb.util.ThreadUtils;
 @Slf4j
 public class DefaultAutoTradingService implements AutoTradingService {
 
-	@Autowired
-	private BithumbApiService bithumbApiService;
-
-	@Autowired
-	private TradingService tradingService;
+	private final BithumbApiService bithumbApiService;
+	private final TradingService tradingService;
 
 	private volatile boolean running;
+
+	public DefaultAutoTradingService(
+			BithumbApiService bithumbApiService, TradingService tradingService) {
+		this.bithumbApiService = bithumbApiService;
+		this.tradingService = tradingService;
+	}
 
 	@Override
 	public void start(TradingScenario... scenarios) {
 		this.running = true;
 
+		TradingScenarioExecution[] executions = createTradingScenarioExecutions(scenarios);
+		while (this.running) {
+			for (TradingScenarioExecution execution : executions) {
+				runExecution(execution);
+			}
+
+			ThreadUtils.delay();
+		}
+	}
+
+	private TradingScenarioExecution[] createTradingScenarioExecutions(TradingScenario[] scenarios) {
 		TradingScenarioExecution[] executions = new TradingScenarioExecution[scenarios.length];
 		for (int i = 0; i < executions.length; i++) {
 			TradingScenario scenario = scenarios[i];
@@ -41,59 +54,55 @@ public class DefaultAutoTradingService implements AutoTradingService {
 			executions[i].setBasePrice(getCurrentBasePrice(scenario.getCurrency()));
 			executions[i].logPrices();
 		}
+		return executions;
+	}
 
-		while (this.running) {
-			for (TradingScenarioExecution execution : executions) {
-				try {
-					TradingScenario scenario = execution.getScenario();
-					Currency currency = scenario.getCurrency();
-					Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
+	void runExecution(TradingScenarioExecution execution) {
+		try {
+			TradingScenario scenario = execution.getScenario();
+			Currency currency = scenario.getCurrency();
+			Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
 
-					int highestBuyPrice = getHighestBuyPrice(orderbook);
-					int lowestSellPrice = getLowestSellPrice(orderbook);
+			int highestBuyPrice = getHighestBuyPrice(orderbook);
+			int lowestSellPrice = getLowestSellPrice(orderbook);
 
-					int basePrice = execution.getBasePrice();
-					int buyPriceGapInPercentages = calculateGapInPercentages(basePrice, highestBuyPrice);
-					int sellPriceGapInPercentages = calculateGapInPercentages(basePrice, lowestSellPrice);
+			int basePrice = execution.getBasePrice();
+			int buyPriceGapInPercentages = calculateGapInPercentages(basePrice, highestBuyPrice);
+			int sellPriceGapInPercentages = calculateGapInPercentages(basePrice, lowestSellPrice);
 
-					TradingStrategy strategy = execution.getStrategy();
-					if (buyPriceGapInPercentages <= strategy.getBuySignalGapInPercentages()) {
-						log.info("Try to buy now: {}", lowestSellPrice);
+			TradingStrategy strategy = execution.getStrategy();
+			if (buyPriceGapInPercentages <= strategy.getBuySignalGapInPercentages()) {
+				log.info("buyPriceGapInPercentages: {}", buyPriceGapInPercentages);
+				log.info("Try to buy now: {}", lowestSellPrice);
 
-						this.tradingService.buy(currency, lowestSellPrice, scenario.getCurrencyUnit());
+				this.tradingService.buy(currency, lowestSellPrice, scenario.getCurrencyUnit());
 
-						// FIXME: This should be replaced with the actual buy price.
-						int buyPrice = lowestSellPrice;
-						execution.buy(buyPrice);
-						execution.logPrices();
-						execution.logTotalStatistics();
-						continue;
-					}
-
-					if (sellPriceGapInPercentages >= strategy.getSellSignalGapInPercentages()) {
-						log.info("Try to sell now: {}", highestBuyPrice);
-
-						this.tradingService.sell(currency, highestBuyPrice, scenario.getCurrencyUnit());
-
-						// FIXME: This should be replaced with the actual sell price.
-						int sellPrice = highestBuyPrice;
-						execution.sell(sellPrice);
-						execution.logPrices();
-						execution.logTotalStatistics();
-						continue;
-					}
-				}
-				catch (RestClientException ex) {
-					log.warn("Target server fault: {}", ex.getMessage());
-					log.debug("Target server fault.", ex);
-				}
-				catch (TradingFailedException ex) {
-					log.warn("Trading failed: {}", ex.getMessage());
-					log.debug("Trading failed.", ex);
-				}
+				// FIXME: This should be replaced with the actual buy price.
+				int buyPrice = lowestSellPrice;
+				execution.buy(buyPrice);
+				execution.logPrices();
+				execution.logTotalStatistics();
 			}
+			else if (sellPriceGapInPercentages >= strategy.getSellSignalGapInPercentages()) {
+				log.info("sellPriceGapInPercentages: {}", sellPriceGapInPercentages);
+				log.info("Try to sell now: {}", highestBuyPrice);
 
-			ThreadUtils.delay();
+				this.tradingService.sell(currency, highestBuyPrice, scenario.getCurrencyUnit());
+
+				// FIXME: This should be replaced with the actual sell price.
+				int sellPrice = highestBuyPrice;
+				execution.sell(sellPrice);
+				execution.logPrices();
+				execution.logTotalStatistics();
+			}
+		}
+		catch (RestClientException ex) {
+			log.warn("Target server fault: {}", ex.getMessage());
+			log.debug("Target server fault.", ex);
+		}
+		catch (TradingFailedException ex) {
+			log.warn("Trading failed: {}", ex.getMessage());
+			log.debug("Trading failed.", ex);
 		}
 	}
 
