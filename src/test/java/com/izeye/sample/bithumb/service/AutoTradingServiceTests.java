@@ -41,8 +41,8 @@ public class AutoTradingServiceTests {
 
 		waitLogin();
 
-		this.autoTradingService.start(SCENARIO_1);
-//		this.autoTradingService.start(SCENARIO_1, SCENARIO_2, SCENARIO_3);
+//		this.autoTradingService.start(SCENARIO_1);
+		this.autoTradingService.start(SCENARIO_1, SCENARIO_2, SCENARIO_3);
 	}
 
 	private void startAutoTradingServiceStopThread() {

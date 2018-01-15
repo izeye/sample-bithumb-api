@@ -67,11 +67,12 @@ public class DefaultAutoTradingService implements AutoTradingService {
 			int lowestSellPrice = getLowestSellPrice(orderbook);
 
 			int basePrice = execution.getBasePrice();
-			int buyPriceGapInPercentages = calculateGapInPercentages(basePrice, highestBuyPrice);
-			int sellPriceGapInPercentages = calculateGapInPercentages(basePrice, lowestSellPrice);
+			int buyPriceGapInPercentages = calculateGapInPercentages(basePrice, lowestSellPrice);
+			int sellPriceGapInPercentages = calculateGapInPercentages(basePrice, highestBuyPrice);
 
 			TradingStrategy strategy = execution.getStrategy();
 			if (buyPriceGapInPercentages <= strategy.getBuySignalGapInPercentages()) {
+				log.info("basePrice: {}", basePrice);
 				log.info("buyPriceGapInPercentages: {}", buyPriceGapInPercentages);
 				log.info("Try to buy now: {}", lowestSellPrice);
 
@@ -84,6 +85,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 				execution.logTotalStatistics();
 			}
 			else if (sellPriceGapInPercentages >= strategy.getSellSignalGapInPercentages()) {
+				log.info("basePrice: {}", basePrice);
 				log.info("sellPriceGapInPercentages: {}", sellPriceGapInPercentages);
 				log.info("Try to sell now: {}", highestBuyPrice);
 
