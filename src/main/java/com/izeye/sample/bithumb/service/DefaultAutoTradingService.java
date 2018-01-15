@@ -57,7 +57,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		return executions;
 	}
 
-	void runExecution(TradingScenarioExecution execution) {
+	private void runExecution(TradingScenarioExecution execution) {
 		try {
 			TradingScenario scenario = execution.getScenario();
 			Currency currency = scenario.getCurrency();
