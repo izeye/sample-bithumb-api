@@ -1,5 +1,8 @@
 package com.izeye.sample.bithumb.service;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 
@@ -26,6 +29,8 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 	private volatile boolean running;
 
+	private final Map<Currency, Orderbook> orderbookCache = new HashMap<>();
+
 	public DefaultAutoTradingService(
 			BithumbApiService bithumbApiService, TradingService tradingService) {
 		this.bithumbApiService = bithumbApiService;
@@ -41,6 +46,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 			for (TradingScenarioExecution execution : executions) {
 				runExecution(execution);
 			}
+			this.orderbookCache.clear();
 
 			ThreadUtils.delay();
 		}
@@ -61,7 +67,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		try {
 			TradingScenario scenario = execution.getScenario();
 			Currency currency = scenario.getCurrency();
-			Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
+			Orderbook orderbook = getOrderbook(currency);
 
 			int highestBuyPrice = getHighestBuyPrice(orderbook);
 			int lowestSellPrice = getLowestSellPrice(orderbook);
@@ -108,6 +114,15 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		}
 	}
 
+	private Orderbook getOrderbook(Currency currency) {
+		Orderbook orderbook = this.orderbookCache.get(currency);
+		if (orderbook == null) {
+			orderbook = this.bithumbApiService.getOrderbook(currency);
+			this.orderbookCache.put(currency, orderbook);
+		}
+		return orderbook;
+	}
+
 	@Override
 	public void stop() {
 		this.running = false;
@@ -122,7 +137,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 	}
 
 	private int getCurrentBasePrice(Currency currency) {
-		Orderbook orderbook = this.bithumbApiService.getOrderbook(currency);
+		Orderbook orderbook = getOrderbook(currency);
 		return (getHighestBuyPrice(orderbook) + getLowestSellPrice(orderbook)) / 2;
 	}
 
