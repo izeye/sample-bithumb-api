@@ -47,6 +47,8 @@ public class SeleniumBithumbTradingService implements TradingService {
 			"잠시 후 이용해 주십시오.9999"
 	)));
 
+	private static final int MAX_MESSAGE_LOOKUP_TRIES = 10;
+
 	private final ChromeDriver driver;
 
 	public SeleniumBithumbTradingService() {
@@ -82,15 +84,20 @@ public class SeleniumBithumbTradingService implements TradingService {
 	}
 
 	private void handleFailures() {
-		List<WebElement> messageElements;
-		while (true) {
+		List<WebElement> messageElements = null;
+		boolean found = false;
+		for (int i = 0; i < MAX_MESSAGE_LOOKUP_TRIES; i++) {
 			messageElements = driver.findElements(By.className(CLASS_NAME_MESSAGE));
 			int messageElementsSize = messageElements.size();
 			if (messageElementsSize == 2) {
+				found = true;
 				break;
 			}
 			log.warn("# of message elements: expected 2 but actual: {}", messageElementsSize);
 			ThreadUtils.delay();
+		}
+		if (!found) {
+			throw new TradingFailedException("Failed to buy: failed to look up messages.");
 		}
 
 		for (WebElement messageElement : messageElements) {
