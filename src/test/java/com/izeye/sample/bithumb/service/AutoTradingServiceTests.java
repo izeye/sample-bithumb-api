@@ -10,7 +10,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.izeye.sample.bithumb.domain.Currency;
+import com.izeye.sample.bithumb.domain.CryptoCurrency;
 import com.izeye.sample.bithumb.domain.TradingScenario;
 
 /**
@@ -30,7 +30,7 @@ public class AutoTradingServiceTests {
 	public void runScenarios() {
 		startAutoTradingServiceStopThread();
 
-		this.autoTradingService.start(new TradingScenario(Currency.XRP, 1, 1));
+		this.autoTradingService.start(new TradingScenario(CryptoCurrency.XRP, 1, 1));
 	}
 
 	private void startAutoTradingServiceStopThread() {

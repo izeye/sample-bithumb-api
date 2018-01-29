@@ -8,7 +8,7 @@ import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import com.izeye.sample.bithumb.domain.Currency;
+import com.izeye.sample.bithumb.domain.CryptoCurrency;
 import com.izeye.sample.bithumb.domain.Orderbook;
 
 /**
@@ -39,22 +39,22 @@ public class DefaultBithumbApiService implements BithumbApiService {
 	}
 
 	@Override
-	public Map<String, Object> getTicker(Currency currency) {
+	public Map<String, Object> getTicker(CryptoCurrency currency) {
 		return this.restTemplate.getForObject(URL_TICKER, Map.class, currency);
 	}
 
 	@Override
-	public Orderbook getOrderbook(Currency currency) {
+	public Orderbook getOrderbook(CryptoCurrency currency) {
 		return this.restTemplate.getForObject(URL_ORDERBOOK, Orderbook.class, currency);
 	}
 
 	@Override
-	public Map<String, Object> getRecentTransactions(Currency currency) {
+	public Map<String, Object> getRecentTransactions(CryptoCurrency currency) {
 		return this.restTemplate.getForObject(URL_RECENT_TRANSACTIONS, Map.class, currency);
 	}
 
 	@Override
-	public Map<String, Object> getAccount(Currency currency) {
+	public Map<String, Object> getAccount(CryptoCurrency currency) {
 		return this.restTemplate.getForObject(
 				URL_ACCOUNT, Map.class, this.properties.getApiKey(), this.properties.getSecretKey(), currency);
 	}

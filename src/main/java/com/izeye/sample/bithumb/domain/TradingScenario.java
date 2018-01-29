@@ -12,7 +12,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class TradingScenario {
 
-	private Currency currency;
+	private CryptoCurrency currency;
 	private double currencyUnit;
 	private int signalGapInPercentages;
 

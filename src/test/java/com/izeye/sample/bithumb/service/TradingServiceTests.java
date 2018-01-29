@@ -10,7 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.izeye.sample.bithumb.domain.Currency;
+import com.izeye.sample.bithumb.domain.CryptoCurrency;
 
 /**
  * Tests for {@link TradingService}.
@@ -32,7 +32,7 @@ public class TradingServiceTests {
 	public void testBuy() {
 		waitLogin();
 
-		this.tradingService.buy(Currency.XRP, 4100, 1);
+		this.tradingService.buy(CryptoCurrency.XRP, 4100, 1);
 	}
 
 	// NOTE: Manual login involved to pass this test.
@@ -41,7 +41,7 @@ public class TradingServiceTests {
 	public void testSell() {
 		waitLogin();
 
-		this.tradingService.sell(Currency.XRP, 4150, 1);
+		this.tradingService.sell(CryptoCurrency.XRP, 4150, 1);
 	}
 
 	private void waitLogin() {

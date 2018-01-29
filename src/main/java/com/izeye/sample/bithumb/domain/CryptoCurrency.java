@@ -5,7 +5,7 @@ package com.izeye.sample.bithumb.domain;
  *
  * @author Johnny Lim
  */
-public enum Currency {
+public enum CryptoCurrency {
 
 	/**
 	 * For Bitcoin Cash

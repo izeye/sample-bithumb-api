@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClientException;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.izeye.sample.bithumb.domain.Currency;
+import com.izeye.sample.bithumb.domain.CryptoCurrency;
 import com.izeye.sample.bithumb.domain.Orderbook;
 import com.izeye.sample.bithumb.domain.TradingScenario;
 import com.izeye.sample.bithumb.domain.TradingScenarioExecution;
@@ -29,7 +29,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 
 	private volatile boolean running;
 
-	private final Map<Currency, Orderbook> orderbookCache = new HashMap<>();
+	private final Map<CryptoCurrency, Orderbook> orderbookCache = new HashMap<>();
 
 	public DefaultAutoTradingService(
 			BithumbApiService bithumbApiService, TradingService tradingService) {
@@ -66,7 +66,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 	private void runExecution(TradingScenarioExecution execution) {
 		try {
 			TradingScenario scenario = execution.getScenario();
-			Currency currency = scenario.getCurrency();
+			CryptoCurrency currency = scenario.getCurrency();
 			Orderbook orderbook = getOrderbook(currency);
 
 			int highestBuyPrice = getHighestBuyPrice(orderbook);
@@ -114,7 +114,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		}
 	}
 
-	private Orderbook getOrderbook(Currency currency) {
+	private Orderbook getOrderbook(CryptoCurrency currency) {
 		Orderbook orderbook = this.orderbookCache.get(currency);
 		if (orderbook == null) {
 			orderbook = this.bithumbApiService.getOrderbook(currency);
@@ -136,7 +136,7 @@ public class DefaultAutoTradingService implements AutoTradingService {
 		return orderbook.getData().getAsks().get(0).getPrice();
 	}
 
-	private int getCurrentBasePrice(Currency currency) {
+	private int getCurrentBasePrice(CryptoCurrency currency) {
 		Orderbook orderbook = getOrderbook(currency);
 		return (getHighestBuyPrice(orderbook) + getLowestSellPrice(orderbook)) / 2;
 	}

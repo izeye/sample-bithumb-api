@@ -2,7 +2,7 @@ package com.izeye.sample.bithumb.service;
 
 import java.util.Map;
 
-import com.izeye.sample.bithumb.domain.Currency;
+import com.izeye.sample.bithumb.domain.CryptoCurrency;
 import com.izeye.sample.bithumb.domain.Orderbook;
 
 /**
@@ -12,12 +12,12 @@ import com.izeye.sample.bithumb.domain.Orderbook;
  */
 public interface BithumbApiService {
 
-	Map<String, Object> getTicker(Currency currency);
+	Map<String, Object> getTicker(CryptoCurrency currency);
 
-	Orderbook getOrderbook(Currency currency);
+	Orderbook getOrderbook(CryptoCurrency currency);
 
-	Map<String, Object> getRecentTransactions(Currency currency);
+	Map<String, Object> getRecentTransactions(CryptoCurrency currency);
 
-	Map<String, Object> getAccount(Currency currency);
+	Map<String, Object> getAccount(CryptoCurrency currency);
 
 }

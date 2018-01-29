@@ -11,7 +11,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.izeye.sample.bithumb.domain.Currency;
+import com.izeye.sample.bithumb.domain.CryptoCurrency;
 import com.izeye.sample.bithumb.domain.Orderbook;
 
 /**
@@ -29,19 +29,19 @@ public class BithumbApiServiceTests {
 
 	@Test
 	public void testGetTicker() {
-		Map<String, Object> ticker = this.bithumbApiService.getTicker(Currency.BCH);
+		Map<String, Object> ticker = this.bithumbApiService.getTicker(CryptoCurrency.BCH);
 		System.out.println(ticker);
 	}
 
 	@Test
 	public void testGetOrderbook() {
-		Orderbook orderbook = this.bithumbApiService.getOrderbook(Currency.BCH);
+		Orderbook orderbook = this.bithumbApiService.getOrderbook(CryptoCurrency.BCH);
 		System.out.println(orderbook);
 	}
 
 	@Test
 	public void testGetRecentTransactions() {
-		Map<String, Object> recentTransactions = this.bithumbApiService.getRecentTransactions(Currency.BCH);
+		Map<String, Object> recentTransactions = this.bithumbApiService.getRecentTransactions(CryptoCurrency.BCH);
 		System.out.println(recentTransactions);
 	}
 
@@ -49,7 +49,7 @@ public class BithumbApiServiceTests {
 	@Ignore
 	@Test
 	public void testGetAccount() {
-		Map<String, Object> account = this.bithumbApiService.getAccount(Currency.BCH);
+		Map<String, Object> account = this.bithumbApiService.getAccount(CryptoCurrency.BCH);
 		System.out.println(account);
 	}
 

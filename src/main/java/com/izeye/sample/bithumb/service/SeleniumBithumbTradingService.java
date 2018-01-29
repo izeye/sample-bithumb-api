@@ -13,7 +13,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import com.izeye.sample.bithumb.domain.Currency;
+import com.izeye.sample.bithumb.domain.CryptoCurrency;
 import com.izeye.sample.bithumb.util.ThreadUtils;
 
 /**
@@ -59,7 +59,7 @@ public class SeleniumBithumbTradingService implements TradingService {
 	}
 
 	@Override
-	public void buy(Currency currency, int price, double amount) {
+	public void buy(CryptoCurrency currency, int price, double amount) {
 		try {
 			this.driver.get(ORDER_URL + currency);
 
@@ -110,7 +110,7 @@ public class SeleniumBithumbTradingService implements TradingService {
 	}
 
 	@Override
-	public void sell(Currency currency, int price, double amount) {
+	public void sell(CryptoCurrency currency, int price, double amount) {
 		try {
 			this.driver.get(ORDER_URL + currency);
 
