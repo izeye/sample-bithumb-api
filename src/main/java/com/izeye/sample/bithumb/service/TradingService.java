@@ -1,6 +1,6 @@
 package com.izeye.sample.bithumb.service;
 
-import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.Currency;
 
 /**
  * Trading service.

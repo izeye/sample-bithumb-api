@@ -2,7 +2,7 @@ package com.izeye.sample.bithumb.service;
 
 import java.util.Map;
 
-import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.Currency;
 import com.izeye.sample.bithumb.domain.Orderbook;
 
 /**

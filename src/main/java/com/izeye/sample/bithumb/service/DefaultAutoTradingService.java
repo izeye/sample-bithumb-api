@@ -8,7 +8,7 @@ import org.springframework.web.client.RestClientException;
 
 import lombok.extern.slf4j.Slf4j;
 
-import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.Currency;
 import com.izeye.sample.bithumb.domain.Orderbook;
 import com.izeye.sample.bithumb.domain.TradingScenario;
 import com.izeye.sample.bithumb.domain.TradingScenarioExecution;

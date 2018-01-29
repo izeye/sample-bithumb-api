@@ -3,8 +3,6 @@ package com.izeye.sample.bithumb.domain;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import com.izeye.sample.bithumb.Currency;
-
 /**
  * Trading scenario.
  *

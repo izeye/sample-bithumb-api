@@ -1,4 +1,4 @@
-package com.izeye.sample.bithumb;
+package com.izeye.sample.bithumb.domain;
 
 /**
  * Crypto currency.

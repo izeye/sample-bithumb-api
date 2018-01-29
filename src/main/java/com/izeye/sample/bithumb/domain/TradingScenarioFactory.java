@@ -1,7 +1,5 @@
 package com.izeye.sample.bithumb.domain;
 
-import com.izeye.sample.bithumb.Currency;
-
 /**
  * Factory for {@link TradingScenario}.
  *

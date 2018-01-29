@@ -16,7 +16,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TradingScenarioExecution {
 
-	private static final double BITHUMB_TRADING_FEE_IN_PERCENTAGES = 0.15d;
+//	private static final double BITHUMB_TRADING_FEE_IN_PERCENTAGES = 0.15d;
+	private static final double BITHUMB_TRADING_FEE_IN_PERCENTAGES = 0d;
 
 	private final TradingScenario scenario;
 	private final TradingStrategy strategy;

@@ -10,7 +10,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.Currency;
 
 /**
  * Tests for {@link TradingService}.

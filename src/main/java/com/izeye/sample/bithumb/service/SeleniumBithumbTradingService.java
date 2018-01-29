@@ -13,7 +13,7 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
-import com.izeye.sample.bithumb.Currency;
+import com.izeye.sample.bithumb.domain.Currency;
 import com.izeye.sample.bithumb.util.ThreadUtils;
 
 /**
