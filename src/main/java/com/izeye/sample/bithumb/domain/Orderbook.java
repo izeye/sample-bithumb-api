@@ -12,12 +12,18 @@ public class Orderbook {
 
 	private Data data;
 
+	/**
+	 * Data.
+	 */
 	@lombok.Data
 	public static class Data {
 
 		private List<Order> bids;
 		private List<Order> asks;
 
+		/**
+		 * Order.
+		 */
 		@lombok.Data
 		public static class Order {
 
