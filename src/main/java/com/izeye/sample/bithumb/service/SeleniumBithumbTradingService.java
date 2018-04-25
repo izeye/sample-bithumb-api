@@ -52,7 +52,14 @@ public class SeleniumBithumbTradingService implements TradingService {
 	private final ChromeDriver driver;
 
 	public SeleniumBithumbTradingService() {
-		System.setProperty("webdriver.chrome.driver", "./bin/chrome_driver/chromedriver");
+		String currentWorkingDirectory = System.getProperty("user.dir");
+
+		// NOTE: Handle Intellij.
+		currentWorkingDirectory = currentWorkingDirectory.replace("/.idea/modules", "");
+
+		System.setProperty(
+				"webdriver.chrome.driver",
+				currentWorkingDirectory + "/bin/chrome_driver/chromedriver");
 
 		this.driver = new ChromeDriver();
 		this.driver.get(HOME_URL);
